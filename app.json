@@ -1,4 +1,9 @@
 {
   "name": "RapenburgLauncherV2",
-  "displayName": "RapenburgLauncherV2"
+  "displayName": "RapenburgLauncher",
+  "extra": {
+    "eas": {
+      "projectId": "e70c422c-3c91-443f-8102-828a35d5be44"
+    }
+  }
 }

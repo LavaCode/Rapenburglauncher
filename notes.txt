@@ -1,0 +1,15 @@
+NOTE 1: TO DISPLAY UR:S: 
+
+    add to androidmanifest.xml: 
+
+    <manifest ...>
+        <application
+            ...
+            android:usesCleartextTraffic="true"
+            ...
+            ...
+        </application>
+    </manifest>
+
+--
+NOTE 2: 

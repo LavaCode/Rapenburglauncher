@@ -18,49 +18,70 @@ const App = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [counter, setCounter] = useState(0);
   const [pincode, setPincode] = useState('');
-  const [urlChangeVisible, setUrlChangeVisible] = useState(false)
-  const inactivityTimerRef = useRef(null)
-  const [orientationIsPortrait, setOrientation]=useState(false)
+  const [urlChangeVisible, setUrlChangeVisible] = useState(false);
+  const inactivityTimerRef = useRef(null);
+  const [orientationIsLandscape, setOrientation] = useState(true);
 
   useEffect(() => {
     loadStoredURL();
-    checkOrientation();
+    changeScreenOrientation();
   }, []);
 
   useEffect(() => {
     checkCounter();
   }, [counter]);
 
+  useEffect(() => {
+    updateOrientation
+  }, [orientationIsLandscape])
+
   const checkCounter = () => {
     if (counter == 5) {
       setCounter(0);
       handleOpenModal();
-      //set elseif counter > 0 to reset after each press
-    } else if (counter == 1) {
+    } else if (counter > 0) {
       resetInactivityTimer();
     }
   }
 
-  const checkOrientation = async () => {
-    const orientation = await ScreenOrientation.getOrientationAsync();
-    if(orientation == 3 || orientation == 4) {
-      setOrientation(false);
-    } else {
-      setOrientation(true);
-    }
-  };
-
   const changeScreenOrientation = async () => {
-    if(orientationIsPortrait==true){
-    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
+    const storedOrientation = await AsyncStorage.getItem('orientation');
+    if(storedOrientation == 'landscape') {
+      // alert('to portrait');
+      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
     }
-    else if(orientationIsPortrait==false){
-      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT)
+    else if(storedOrientation == 'portrait') {
+      // alert('to landscape');
+      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
+    } else {
+      const currentOrientation = await ScreenOrientation.getOrientationAsync();
+      if (currentOrientation == 1 || currentOrientation == 2) {
+        setOrientation(false);
+      } else if (currentOrientation == 3 || currentOrientation == 4) {
+        setOrientation(true);
+      }
     }
   }
 
   const toggleOrientation=()=>{
-    setOrientation(!orientationIsPortrait);
+    setOrientation(!orientationIsLandscape);
+    updateOrientation();
+  }
+
+  const updateOrientation = async () => {
+    if (orientationIsLandscape) {
+      try {
+        await AsyncStorage.setItem('orientation', 'landscape');
+      } catch(e) {
+        alert(e);
+      }
+    } else if (!orientationIsLandscape) {
+      try {
+        await AsyncStorage.setItem('orientation', 'portrait');
+      } catch(e) {
+        alert(e);
+      }
+    }
     changeScreenOrientation();
   }
 
@@ -69,7 +90,7 @@ const App = () => {
     if (inactivityTimerRef) {
       clearTimeout(inactivityTimerRef.current)
     }
-    inactivityTimerRef.current = setTimeout(() => setCounter(0), 5000);
+    inactivityTimerRef.current = setTimeout(() => setCounter(0), 2000);
   };
 
   const loadStoredURL = async () => {
@@ -112,7 +133,6 @@ const App = () => {
     } else {
       setPincode('');
     }
-
   }
 
   return (
@@ -139,18 +159,18 @@ const App = () => {
         statusBarTranslucent={true}
         >
           <View style={styles.centeredView}>
-            <View style={styles.logoContainer}>
+            <View style={orientationIsLandscape ? styles.logoContainerLandscape : styles.logoContainerPortrait}>
                 <Image
-                  style={orientationIsPortrait ? styles.logoPortrait : styles.logoLandscape}
+                  style={styles.logo}
                   source={require(`./assets/logo.png`)}
                 />
             </View>
               {!urlChangeVisible ?
-              <View style={orientationIsPortrait ? styles.modalViewPortrait : styles.modalViewLandscape}>
-                <Text style={orientationIsPortrait ? styles.pinTextPortrait : styles.pinTextLandscape}>Please enter PIN:</Text>
+              <View style={orientationIsLandscape ? styles.modalViewLandscape : styles.modalViewPortrait}>
+                <Text style={orientationIsLandscape ? styles.pinTextLandscape : styles.pinTextPortrait}>Please enter PIN:</Text>
                 <TextInput
-                  style={orientationIsPortrait ? [styles.textBoxPortrait, styles.pinBoxPortrait] : [styles.textBoxLandscape, styles.pinBoxLandscape]}
-                  placeholder="****"
+                  style={orientationIsLandscape ? [styles.textBoxLandscape, styles.pinBoxLandscape] : [styles.textBoxPortrait, styles.pinBoxPortrait]}
+                  placeholder="Enter PIN"
                   secureTextEntry
                   keyboardType="numeric"
                   maxLength={4}
@@ -160,43 +180,45 @@ const App = () => {
                   value={pincode}
                 />
                 <TouchableOpacity
-                  style={orientationIsPortrait ? styles.pinSubmitButtonPortrait : styles.pinSubmitButtonLandscape}
+                  style={orientationIsLandscape ? styles.pinSubmitButtonLandscape : styles.pinSubmitButtonPortrait}
                   onPress={handlePinInput}
                 >
                   <Text style={styles.buttonText}>Submit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={orientationIsPortrait ? [styles.updateUrlButtonPortrait, styles.cancelButton] : [styles.updateUrlButtonLandscape, styles.cancelButton]}
+                  style={orientationIsLandscape ? [styles.updateUrlButtonLandscape, styles.cancelButton] : [styles.updateUrlButtonPortrait, styles.cancelButton]}
                   onPress={handleCloseModal}
                 >
                   <Text style={styles.buttonText}>Cancel</Text>
                 </TouchableOpacity>
               </View>
               :
-              <View style={orientationIsPortrait ? styles.modalViewPortrait : styles.modalViewLandscape}>
-                <Text style={orientationIsPortrait ? styles.pinTextPortrait : styles.pinTextLandscape}>Please enter URL:</Text>
+              <View style={orientationIsLandscape ? styles.modalViewLandscape : styles.modalViewPortrait}>
+                <Text style={orientationIsLandscape ? styles.pinTextLandscape : styles.pinTextPortrait}>Please enter URL:</Text>
                 <TextInput
-                  style={orientationIsPortrait ? styles.textBoxPortrait : styles.textBoxLandscape}
+                  style={orientationIsLandscape ? styles.textBoxLandscape : styles.textBoxPortrait}
                   placeholder="Enter new URL"
                   onChangeText={(text) => setUrlToOpen(text)}
                   value={urlToOpen}
                 />
-                <TouchableOpacity style={orientationIsPortrait ? styles.updateUrlButtonPortrait : styles.updateUrlButtonLandscape} onPress={handleChangeURL}>
+                <TouchableOpacity style={orientationIsLandscape ? styles.updateUrlButtonLandscape : styles.updateUrlButtonPortrait} onPress={handleChangeURL}>
                   <Text style={styles.buttonText}>Update URL</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={orientationIsPortrait ? [styles.updateUrlButtonPortrait, styles.changeOrientationButton] : [styles.updateUrlButtonLandscape, styles.changeOrientationButton]} onPress={toggleOrientation}>
+                <TouchableOpacity style={orientationIsLandscape ? [styles.updateUrlButtonLandscape, styles.changeOrientationButton] : [styles.updateUrlButtonPortrait, styles.changeOrientationButton]} onPress={toggleOrientation}>
                   <Text style={styles.buttonText}>Change app orientation</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={orientationIsPortrait ? [styles.updateUrlButtonPortrait, styles.cancelButton] : [styles.updateUrlButtonLandscape, styles.cancelButton]}
+                  style={orientationIsLandscape ? [styles.updateUrlButtonLandscape, styles.cancelButton] : [styles.updateUrlButtonPortrait, styles.cancelButton]}
                   onPress={handleCloseModal}
                 >
                   <Text style={styles.buttonText}>Cancel</Text>
                 </TouchableOpacity>
               </View>
               }
-            <Text style={orientationIsPortrait ? styles.supportTextPortrait : styles.supportTextLandscape}>For support, please contact us at: support@rapenburgplaza.nl</Text>
-            <Text style={orientationIsPortrait ? styles.webTextPortrait : styles.webTextLandscape}>www.rapenburgplaza.nl</Text>
+            <View style={orientationIsLandscape ? styles.supportBoxLandscape : styles.supportBoxPortrait}>
+              <Text style={orientationIsLandscape ? styles.supportTextLandscape : styles.supportTextPortrait}>For support, please contact us at: support@rapenburgplaza.nl</Text>
+              <Text style={orientationIsLandscape ? styles.webTextLandscape : styles.webTextPortrait}>www.rapenburgplaza.nl</Text>
+            </View>
         </View>
       </Modal>
     </View>

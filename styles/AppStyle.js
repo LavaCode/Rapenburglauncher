@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center', 
         alignItems: 'center', 
         height: '60%',
+        maxHeight: 200,
         backgroundColor: 'lightgrey',
         shadowColor: '#000',
         shadowOffset: {
@@ -48,8 +49,9 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
         width: '40%',
-        marginBottom: '0%',
-        marginTop: '-20%',
+        maxWidth: 500,
+        marginBottom: '10%',
+        marginTop: '0%',
     },
     modalViewPortrait: {
         borderRadius: 20,
@@ -66,24 +68,21 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
         width: '60%',
-        marginBottom: '60%',
+        marginBottom: '50%',
         marginTop: '0%',
     },
-    logoContainer: {
+    logoContainerLandscape: {
+        position: 'absolute',
+        left: 25,
+        top: 25,
+        height: 100,
+        width: 100,
+    },
+    logoContainerPortrait: {
         height: 125,
         width: 125,
     },
-    logoLandscape: {
-        position: 'absolute',
-        top: '50%',
-        right: '250%',
-        width: 100,
-        height: 100,
-        opacity: 0.7,
-        tintColor: 'red',
-        resizeMode: 'contain',
-    },
-    logoPortrait: {
+    logo: {
         width: 'auto',
         height: '90%',
         opacity: 0.7,
@@ -94,7 +93,8 @@ const styles = StyleSheet.create({
         borderColor: 'gray', 
         backgroundColor: 'white',
         borderWidth: 1.5, 
-        padding: 0, 
+        paddingHorizontal: 5,
+        paddingVertical: 5, 
         marginBottom: 5, 
         width: '80%',
     },
@@ -117,6 +117,9 @@ const styles = StyleSheet.create({
         marginBottom: 10, 
     },  
     pinBoxLandscape: {  
+        justifyContent: 'center',
+    },
+    pinBoxPortrait: {  
         justifyContent: 'center',
     },
     pinSubmitButtonLandscape: {
@@ -161,29 +164,41 @@ const styles = StyleSheet.create({
         color: 'white', 
         fontSize: 16
     },
-    supportTextLandscape: {
-        width: '80%',
-        textAlign: 'center',
-        color: 'grey',
-        marginTop: '-1%'
+    supportBoxLandscape: {
+        position: 'absolute',
+        bottom: 10,
+        height: '20%',
+        maxHeight: 65,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    supportTextPortrait: {
+    supportBoxPortrait: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '70%',
+    },
+    supportTextLandscape: {
         width: '80%',
         textAlign: 'center',
         color: 'grey',
         marginBottom: '1%'
     },
+    supportTextPortrait: {
+        width: '80%',
+        textAlign: 'center',
+        color: 'grey',
+        marginBottom: '10%'
+    },
     webTextLandscape: {
         opacity: 0.6,
         color: '#ff726f',
-        marginTop: '-5%',
+        marginBottom: '0%',
     },
     webTextPortrait: {
         opacity: 0.6,
         color: '#ff726f',
-        marginBottom: '1%',
+        marginBottom: '2%',
     }
 });
-
 export { styles }
 
